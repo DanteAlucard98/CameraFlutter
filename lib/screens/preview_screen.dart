@@ -12,6 +12,7 @@ class PreviewScreen extends StatelessWidget {
     required this.fileList,
   });
 
+  //Manera grafica con el uso de capturesScreen ir a la lista de imagenes
   @override
   Widget build(BuildContext context) {
     return Scaffold(

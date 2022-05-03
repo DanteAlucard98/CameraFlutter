@@ -39,10 +39,13 @@ class _CameraScreenState extends State<CameraScreen>
 
   List<File> allFileList = [];
 
+  //Tipos de resoluciones que se tiene
   final resolutionPresets = ResolutionPreset.values;
 
+  //Resolucion por defecto
   ResolutionPreset currentResolutionPreset = ResolutionPreset.high;
 
+  //Permisos de usar las camaras del dispositivo
   getPermissionStatus() async {
     await Permission.camera.request();
     var status = await Permission.camera.status;
@@ -59,6 +62,8 @@ class _CameraScreenState extends State<CameraScreen>
     }
   }
 
+  //Actualizar la imagen/video de vista previa para cuando se quiera
+  //realizar una nueva captura o grabacion
   refreshAlreadyCapturedImages() async {
     final directory = await getApplicationDocumentsDirectory();
     List<FileSystemEntity> fileList = await directory.list().toList();
@@ -91,6 +96,7 @@ class _CameraScreenState extends State<CameraScreen>
     }
   }
 
+  //Captura la foto
   Future<XFile?> takePicture() async {
     final CameraController? cameraController = controller;
 
@@ -107,6 +113,7 @@ class _CameraScreenState extends State<CameraScreen>
     }
   }
 
+  //Iniciar el reproductor de video con el archivo almacenado
   Future<void> _startVideoPlayer() async {
     if (_videoFile != null) {
       videoController = VideoPlayerController.file(_videoFile!);
@@ -118,6 +125,8 @@ class _CameraScreenState extends State<CameraScreen>
     }
   }
 
+  //Funciones para administrar la grabacion del video con la
+  //camara del dispositivo
   Future<void> startVideoRecording() async {
     final CameraController? cameraController = controller;
 
@@ -178,23 +187,30 @@ class _CameraScreenState extends State<CameraScreen>
     }
   }
 
+  //Resetena los valores de la camara
   void resetCameraValues() async {
     _currentZoomLevel = 1.0;
     _currentExposureOffset = 0.0;
   }
 
+  //Uso del metodo para cambiar los controladores  cuando se quiere usar la camara de
+  //enfrente o trasero ya que cambia su resolucion y configuracion
   void onNewCameraSelected(CameraDescription cameraDescription) async {
     final previousCameraController = controller;
 
+    //Poder seleccionar como usuario la calidad de la imagen
     final CameraController cameraController = CameraController(
       cameraDescription,
       currentResolutionPreset,
       imageFormatGroup: ImageFormatGroup.jpeg,
     );
 
+    //Resetear los valores de la camara
     await previousCameraController?.dispose();
 
     resetCameraValues();
+
+    //Cambiar los valores de la camara como es el zoom y el brillo
 
     if (mounted) {
       setState(() {
@@ -222,6 +238,7 @@ class _CameraScreenState extends State<CameraScreen>
             .then((value) => _minAvailableZoom = value),
       ]);
 
+      //Modos de flash que se tienen
       _currentFlashMode = controller!.value.flashMode;
     } on CameraException catch (e) {
       print('Error initializing camera: $e');
@@ -234,6 +251,7 @@ class _CameraScreenState extends State<CameraScreen>
     }
   }
 
+  //Enfocar al objeto con un tap
   void onViewFinderTap(TapDownDetails details, BoxConstraints constraints) {
     if (controller == null) {
       return;
@@ -259,6 +277,8 @@ class _CameraScreenState extends State<CameraScreen>
     super.initState();
   }
 
+  //Para administrar el ciclo de vida del uso de la camara para poder
+  //liberar los recursos de memoria
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final CameraController? cameraController = controller;
@@ -286,7 +306,9 @@ class _CameraScreenState extends State<CameraScreen>
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.black,
+//Verificamos los permisos de la camara
         body: _isCameraPermissionGranted
+//Inicializamos la camara preview
             ? _isCameraInitialized
                 ? Column(
                     children: [
@@ -329,6 +351,7 @@ class _CameraScreenState extends State<CameraScreen>
                                           left: 8.0,
                                           right: 8.0,
                                         ),
+//Uso para la lista de calidad de imagen
                                         child: DropdownButton<ResolutionPreset>(
                                           dropdownColor: Colors.black87,
                                           underline: Container(),
@@ -361,7 +384,7 @@ class _CameraScreenState extends State<CameraScreen>
                                       ),
                                     ),
                                   ),
-                                  // Spacer(),
+//Barra Brillo de la camara
                                   Padding(
                                     padding: const EdgeInsets.only(
                                         right: 8.0, top: 16.0),
@@ -404,6 +427,7 @@ class _CameraScreenState extends State<CameraScreen>
                                       ),
                                     ),
                                   ),
+//Barra Zoom de la camara
                                   Row(
                                     children: [
                                       Expanded(
@@ -445,6 +469,7 @@ class _CameraScreenState extends State<CameraScreen>
                                       ),
                                     ],
                                   ),
+//Iconos de pausar o el resumen de la grabacion
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -503,6 +528,7 @@ class _CameraScreenState extends State<CameraScreen>
                                           ],
                                         ),
                                       ),
+//Si la opcion del video esta seleccionado
                                       InkWell(
                                         onTap: _isVideoCameraSelected
                                             ? () async {
@@ -587,6 +613,7 @@ class _CameraScreenState extends State<CameraScreen>
                                           ],
                                         ),
                                       ),
+//Si la opcion de fotos esta seleccionado
                                       InkWell(
                                         onTap: _imageFile != null ||
                                                 _videoFile != null
@@ -714,6 +741,7 @@ class _CameraScreenState extends State<CameraScreen>
                                   ],
                                 ),
                               ),
+//Señalar el tipo de flash
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(
                                     16.0, 8.0, 16.0, 8.0),
@@ -798,6 +826,7 @@ class _CameraScreenState extends State<CameraScreen>
                       ),
                     ],
                   )
+//Permisos
                 : Center(
                     child: Text(
                       'LOADING',

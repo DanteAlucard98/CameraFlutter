@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 class CapturesScreen extends StatelessWidget {
   final List<File> imageFileList;
 
+  //Acceder a la lista de imagenes capturadas con la aplicacion
   const CapturesScreen({required this.imageFileList});
 
   @override
